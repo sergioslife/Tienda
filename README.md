@@ -1,8 +1,8 @@
 <template>
-    <div>
-      <h1>Tienda</h1>
-      <form @submit.prevent="agregarArticulo">
-      <!-- Campos del formulario -->
+  <div>
+    <h1>Tienda</h1>
+    <!-- Formulario para agregar artículos -->
+    <form @submit.prevent="agregarArticulo">
       <div>
         <label for="nombre">Nombre del artículo:</label>
         <input v-model="nombre" type="text" id="nombre" placeholder="Ingrese el nombre del artículo" required>
@@ -17,106 +17,109 @@
       </div>
       <button type="submit">Agregar</button>
     </form>
-      <table>
-        <!-- Encabezado de la tabla -->
-        <thead>
-          <tr>
-            <th>Identificador</th>
-            <th>Nombre del artículo</th>
-            <th>Cantidad</th>
-            <th>Valor unitario</th>
-            <th>Valor total</th>
-            <th>Eliminar</th>
-          </tr>
-        </thead>
-        <!-- Cuerpo de la tabla -->
-        <tbody>
-          <tr v-for="(articulo, index) in carrito" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ articulo.nombre }}</td>
-            <td>{{ articulo.cantidad }}</td>
-            <td>{{ articulo.valor }}</td>
-            <td>{{ articulo.valorTotal }}</td>
-            <td><button @click="eliminarArticulo(index)">Eliminar</button></td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- Resumen de la compra -->
-      <div>
-        <p>Total Compra: {{ totalCompra }}</p>
-        <p>Descuento: {{ descuento }}</p>
-        <p>Total a Pagar: {{ totalConDescuento }}</p>
-      </div>
+    <!-- Tabla para mostrar los artículos agregados -->
+    <table>
+      <!-- Encabezado de la tabla -->
+      <thead>
+        <tr>
+          <th>Identificador</th>
+          <th>Nombre del artículo</th>
+          <th>Cantidad</th>
+          <th>Valor unitario</th>
+          <th>Valor total</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <!-- Cuerpo de la tabla -->
+      <tbody>
+        <!-- Iteración sobre los artículos en el carrito -->
+        <tr v-for="(articulo, index) in carrito" :key="index">
+          <td>{{ index + 1 }}</td>
+          <td>{{ articulo.nombre }}</td>
+          <td>{{ articulo.cantidad }}</td>
+          <td>{{ articulo.valor }}</td>
+          <td>{{ articulo.valorTotal }}</td>
+          <td><button @click="eliminarArticulo(index)">Eliminar</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- Resumen de la compra -->
+    <div>
+      <p>Total Compra: {{ totalCompra }}</p>
+      <p>Descuento: {{ descuento }}</p>
+      <p>Total a Pagar: {{ totalConDescuento }}</p>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        nombre: '',
-        cantidad: 0,
-        valor: 0,
-        carrito: [],
-      };
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      nombre: '',
+      cantidad: 0,
+      valor: 0,
+      carrito: [],
+    };
+  },
+  computed: {
+    // Calcular el total de la compra
+    totalCompra() {
+      return this.carrito.reduce((total, articulo) => total + articulo.valorTotal, 0);
     },
-    computed: {
-      totalCompra() {
-        // Calcular el total de la compra
-        return this.carrito.reduce((total, articulo) => total + articulo.valorTotal, 0);
-      },
-      descuento() {
-        // Calcular el descuento aplicable
-        let descuentoPorCantidad = 0;
-        let descuentoPorPrecio = 0;
-  
-        if (this.totalCompra >= 120000) {
-          descuentoPorPrecio = 0.1;
-        } else if (this.totalCompra >= 60000) {
-          descuentoPorPrecio = 0.05;
-        }
-  
-        if (this.carrito.length >= 12) {
-          descuentoPorCantidad = 0.2;
-        } else if (this.carrito.length >= 6) {
-          descuentoPorCantidad = 0.1;
-        }
-  
-        // Seleccionar el mayor descuento
-        const mayorDescuento = Math.max(descuentoPorCantidad, descuentoPorPrecio);
-  
-        // Aplicar el descuento al total
-        return mayorDescuento * this.totalCompra;
-      },
-      totalConDescuento() {
-        // Calcular el total a pagar con el descuento aplicado
-        return this.totalCompra - this.descuento;
-      },
+    // Calcular el descuento aplicable
+    descuento() {
+      let descuentoPorCantidad = 0;
+      let descuentoPorPrecio = 0;
+
+      if (this.totalCompra >= 120000) {
+        descuentoPorPrecio = 0.1;
+      } else if (this.totalCompra >= 60000) {
+        descuentoPorPrecio = 0.05;
+      }
+
+      if (this.carrito.length >= 12) {
+        descuentoPorCantidad = 0.2;
+      } else if (this.carrito.length >= 6) {
+        descuentoPorCantidad = 0.1;
+      }
+
+      // Seleccionar el mayor descuento
+      const mayorDescuento = Math.max(descuentoPorCantidad, descuentoPorPrecio);
+
+      // Aplicar el descuento al total
+      return mayorDescuento * this.totalCompra;
     },
-    methods: {
-      agregarArticulo() {
-        // Agregar el artículo al carrito
-        this.carrito.push({
-          nombre: this.nombre,
-          cantidad: this.cantidad,
-          valor: this.valor,
-          valorTotal: this.cantidad * this.valor,
-        });
-  
-        // Limpiar los campos del formulario
-        this.nombre = '';
-        this.cantidad = 0;
-        this.valor = 0;
-      },
-      eliminarArticulo(index) {
-        // Eliminar un artículo del carrito
-        this.carrito.splice(index, 1);
-      },
+    // Calcular el total a pagar con el descuento aplicado
+    totalConDescuento() {
+      return this.totalCompra - this.descuento;
     },
-  };
-  </script>
-  
-  <style scoped>
-  /* Estilos CSS personalizados */
-  </style>
+  },
+  methods: {
+    // Agregar un artículo al carrito
+    agregarArticulo() {
+      this.carrito.push({
+        nombre: this.nombre,
+        cantidad: this.cantidad,
+        valor: this.valor,
+        valorTotal: this.cantidad * this.valor,
+      });
+
+      // Limpiar los campos del formulario
+      this.nombre = '';
+      this.cantidad = 0;
+      this.valor = 0;
+    },
+    // Eliminar un artículo del carrito
+    eliminarArticulo(index) {
+      this.carrito.splice(index, 1);
+    },
+  },
+};
+</script>
+
+<style scoped>
+/* Estilos CSS personalizados */
+</style>
+
   
