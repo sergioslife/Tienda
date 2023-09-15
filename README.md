@@ -56,10 +56,11 @@
 export default {
   data() {
     return {
-      nombre: '',
-      cantidad: 0,
-      valor: 0,
-      carrito: [],
+      // Declaración de propiedades de datos
+      nombre: '',        // Nombre del artículo
+      cantidad: 0,       // Cantidad de artículos (inicializada a 0)
+      valor: 0,          // Valor del artículo (inicializada a 0)
+      carrito: [],       // Array para almacenar los artículos agregados al carrito
     };
   },
   computed: {
